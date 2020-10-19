@@ -53,7 +53,7 @@ function Summary(props) {
               <span className="green">+{summary.jobs_growth.regional}%</span>
             }
             {summary.jobs_growth.regional < 0 &&
-              <span className="red">-{summary.jobs_growth.regional}%</span>
+              <span className="red">{summary.jobs_growth.regional}%</span>
             } 
           </p>
           <p>
@@ -64,7 +64,7 @@ function Summary(props) {
               <span className="green"> +{summary.jobs_growth.national_avg}%</span>
             }
             {summary.jobs_growth.national_avg < 0 && 
-              <span className="red"> -{summary.jobs_growth.national_avg}%</span>
+              <span className="red"> {summary.jobs_growth.national_avg}%</span>
             }
           </p>
         </li>
@@ -228,7 +228,7 @@ function EmployingIndustriesRow(props) {
 
 function EmployingIndustries(props) {
   const ei = props.data.employing_industries;
-  
+ 
   ei.industries.forEach(industry => {
     industry.in_occupation_jobs_perc = industry.in_occupation_jobs / ei.jobs;
     industry.jobs_perc = industry.in_occupation_jobs / industry.jobs;
