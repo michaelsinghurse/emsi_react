@@ -12,27 +12,6 @@ var toCurrency = function toCurrency(number) {
   return number.toLocaleString("en-US", { style: "currency", currency: "USD" });
 };
 
-function addMetrics(data) {
-  data.summary.jobs.perc_diff = (data.summary.jobs.regional - data.summary.jobs.national_avg) / data.summary.jobs.national_avg + 1;
-
-  data.trend_comparison.regional_change = data.trend_comparison.regional[data.trend_comparison.regional.length - 1] - data.trend_comparison.regional[0];
-
-  data.trend_comparison.regional_change_perc = data.trend_comparison.regional_change / data.trend_comparison.regional[0];
-
-  data.trend_comparison.state_change = data.trend_comparison.state[data.trend_comparison.state.length - 1] - data.trend_comparison.state[0];
-
-  data.trend_comparison.state_change_perc = data.trend_comparison.state_change / data.trend_comparison.state[0];
-
-  data.trend_comparison.nation_change = data.trend_comparison.nation[data.trend_comparison.nation.length - 1] - data.trend_comparison.nation[0];
-
-  data.trend_comparison.nation_change_perc = data.trend_comparison.nation_change / data.trend_comparison.nation[0];
-
-  data.employing_industries.industries.forEach(function (industry) {
-    industry.in_occupation_jobs_perc = industry.in_occupation_jobs / data.employing_industries.jobs;
-    industry.jobs_perc = industry.in_occupation_jobs / industry.jobs;
-  });
-}
-
 function Header(props) {
   var data = props.data;
 
@@ -57,6 +36,8 @@ function Header(props) {
 function Summary(props) {
   var data = props.data;
   var summary = data.summary;
+
+  summary.jobs.perc_diff = 1 + (summary.jobs.regional - summary.jobs.national_avg) / summary.jobs.national_avg;
 
   return React.createElement(
     "section",
@@ -180,7 +161,16 @@ function Summary(props) {
 }
 
 function TrendComparison(props) {
-  var trendComparison = props.data.trend_comparison;
+  var tc = props.data.trend_comparison;
+
+  tc.regional_change = tc.regional[tc.regional.length - 1] - tc.regional[0];
+  tc.regional_change_perc = tc.regional_change / tc.regional[0];
+
+  tc.state_change = tc.state[tc.state.length - 1] - tc.state[0];
+  tc.state_change_perc = tc.state_change / tc.state[0];
+
+  tc.nation_change = tc.nation[tc.nation.length - 1] - tc.nation[0];
+  tc.nation_change_perc = tc.nation_change / tc.nation[0];
 
   return React.createElement(
     "section",
@@ -209,13 +199,13 @@ function TrendComparison(props) {
           React.createElement(
             "th",
             null,
-            trendComparison.start_year,
+            tc.start_year,
             " jobs"
           ),
           React.createElement(
             "th",
             null,
-            trendComparison.end_year,
+            tc.end_year,
             " jobs"
           ),
           React.createElement(
@@ -249,22 +239,22 @@ function TrendComparison(props) {
           React.createElement(
             "td",
             null,
-            formatNumber(trendComparison.regional[0])
+            formatNumber(tc.regional[0])
           ),
           React.createElement(
             "td",
             null,
-            formatNumber(trendComparison.regional[trendComparison.regional.length - 1])
+            formatNumber(tc.regional[tc.regional.length - 1])
           ),
           React.createElement(
             "td",
             null,
-            formatNumber(trendComparison.regional_change)
+            formatNumber(tc.regional_change)
           ),
           React.createElement(
             "td",
             null,
-            toPercent(trendComparison.regional_change_perc, 1),
+            toPercent(tc.regional_change_perc, 1),
             "%"
           )
         ),
@@ -284,22 +274,22 @@ function TrendComparison(props) {
           React.createElement(
             "td",
             null,
-            formatNumber(trendComparison.state[0])
+            formatNumber(tc.state[0])
           ),
           React.createElement(
             "td",
             null,
-            formatNumber(trendComparison.state[trendComparison.state.length - 1])
+            formatNumber(tc.state[tc.state.length - 1])
           ),
           React.createElement(
             "td",
             null,
-            formatNumber(trendComparison.state_change)
+            formatNumber(tc.state_change)
           ),
           React.createElement(
             "td",
             null,
-            toPercent(trendComparison.state_change_perc, 1),
+            toPercent(tc.state_change_perc, 1),
             "%"
           )
         ),
@@ -319,22 +309,22 @@ function TrendComparison(props) {
           React.createElement(
             "td",
             null,
-            formatNumber(trendComparison.nation[0])
+            formatNumber(tc.nation[0])
           ),
           React.createElement(
             "td",
             null,
-            formatNumber(trendComparison.nation[trendComparison.nation.length - 1])
+            formatNumber(tc.nation[tc.nation.length - 1])
           ),
           React.createElement(
             "td",
             null,
-            formatNumber(trendComparison.nation_change)
+            formatNumber(tc.nation_change)
           ),
           React.createElement(
             "td",
             null,
-            toPercent(trendComparison.nation_change_perc, 1),
+            toPercent(tc.nation_change_perc, 1),
             "%"
           )
         )
@@ -379,9 +369,14 @@ function EmployingIndustriesRow(props) {
 }
 
 function EmployingIndustries(props) {
-  var employingIndustries = props.data.employing_industries;
+  var ei = props.data.employing_industries;
 
-  var tableRows = employingIndustries.industries.map(function (industry) {
+  ei.industries.forEach(function (industry) {
+    industry.in_occupation_jobs_perc = industry.in_occupation_jobs / ei.jobs;
+    industry.jobs_perc = industry.in_occupation_jobs / industry.jobs;
+  });
+
+  var tableRows = ei.industries.map(function (industry) {
     return React.createElement(EmployingIndustriesRow, { key: industry.title, industry: industry });
   });
 
@@ -411,21 +406,21 @@ function EmployingIndustries(props) {
             "th",
             null,
             "Occupation Jobs in Industry (",
-            employingIndustries.year,
+            ei.year,
             ")"
           ),
           React.createElement(
             "th",
             null,
             "% of Occupation in Industry (",
-            employingIndustries.year,
+            ei.year,
             ")"
           ),
           React.createElement(
             "th",
             null,
             "% of Total Jobs in Industry (",
-            employingIndustries.year,
+            ei.year,
             ")"
           )
         )
@@ -440,7 +435,7 @@ function EmployingIndustries(props) {
 }
 
 function App(props) {
-  var data = addMetrics(props.data);
+  var data = props.data;
 
   return React.createElement(
     "div",

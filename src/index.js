@@ -13,39 +13,6 @@ const toCurrency = number => {
   return number.toLocaleString("en-US", {style: "currency", currency: "USD"});
 };
 
-function addMetrics(data) {
-  data.summary.jobs.perc_diff = 
-    (data.summary.jobs.regional - data.summary.jobs.national_avg)
-    / data.summary.jobs.national_avg + 1;
-
-  data.trend_comparison.regional_change =
-    data.trend_comparison.regional[data.trend_comparison.regional.length - 1]
-    - data.trend_comparison.regional[0];
-  
-  data.trend_comparison.regional_change_perc =
-    data.trend_comparison.regional_change / data.trend_comparison.regional[0];
-
-  data.trend_comparison.state_change =
-    data.trend_comparison.state[data.trend_comparison.state.length - 1]
-    - data.trend_comparison.state[0];
-  
-  data.trend_comparison.state_change_perc =
-    data.trend_comparison.state_change / data.trend_comparison.state[0];
-
-  data.trend_comparison.nation_change =
-    data.trend_comparison.nation[data.trend_comparison.nation.length - 1]
-    - data.trend_comparison.nation[0];
-  
-  data.trend_comparison.nation_change_perc =
-    data.trend_comparison.nation_change / data.trend_comparison.nation[0];
-
-  data.employing_industries.industries.forEach(industry => {
-    industry.in_occupation_jobs_perc = 
-      industry.in_occupation_jobs / data.employing_industries.jobs;
-    industry.jobs_perc = industry.in_occupation_jobs / industry.jobs;
-  });
-}
-
 function Header(props) {
   const data = props.data;
 
@@ -60,6 +27,9 @@ function Header(props) {
 function Summary(props) {
   const data = props.data;
   const summary = data.summary;
+
+  summary.jobs.perc_diff = 1 + 
+    (summary.jobs.regional - summary.jobs.national_avg) / summary.jobs.national_avg;
 
   return (
     <section className="summary">
@@ -109,7 +79,16 @@ function Summary(props) {
 }
 
 function TrendComparison(props) {
-  const trendComparison = props.data.trend_comparison;
+  const tc = props.data.trend_comparison;
+
+  tc.regional_change = tc.regional[tc.regional.length - 1] - tc.regional[0];
+  tc.regional_change_perc = tc.regional_change / tc.regional[0];
+
+  tc.state_change = tc.state[tc.state.length - 1] - tc.state[0];
+  tc.state_change_perc = tc.state_change / tc.state[0];
+
+  tc.nation_change = tc.nation[tc.nation.length - 1] - tc.nation[0];
+  tc.nation_change_perc = tc.nation_change / tc.nation[0];
 
   return (
     <section className="trend-comparison">
@@ -120,8 +99,8 @@ function TrendComparison(props) {
           <tr>
             <th></th>
             <th>Region</th>
-            <th>{trendComparison.start_year} jobs</th>
-            <th>{trendComparison.end_year} jobs</th>
+            <th>{tc.start_year} jobs</th>
+            <th>{tc.end_year} jobs</th>
             <th>Change</th>
             <th>% Change</th>
           </tr>
@@ -130,26 +109,26 @@ function TrendComparison(props) {
           <tr className="trend-comparison-region">
             <td>&#x25CF;</td>
             <td>Region</td>
-            <td>{formatNumber(trendComparison.regional[0])}</td>
-            <td>{formatNumber(trendComparison.regional[trendComparison.regional.length - 1])}</td>
-            <td>{formatNumber(trendComparison.regional_change)}</td>
-            <td>{toPercent(trendComparison.regional_change_perc, 1)}%</td>
+            <td>{formatNumber(tc.regional[0])}</td>
+            <td>{formatNumber(tc.regional[tc.regional.length - 1])}</td>
+            <td>{formatNumber(tc.regional_change)}</td>
+            <td>{toPercent(tc.regional_change_perc, 1)}%</td>
           </tr> 
           <tr className="trend-comparison-state">
             <td>&#x25A0;</td>
             <td>State</td>
-            <td>{formatNumber(trendComparison.state[0])}</td>
-            <td>{formatNumber(trendComparison.state[trendComparison.state.length - 1])}</td>
-            <td>{formatNumber(trendComparison.state_change)}</td>
-            <td>{toPercent(trendComparison.state_change_perc, 1)}%</td>
+            <td>{formatNumber(tc.state[0])}</td>
+            <td>{formatNumber(tc.state[tc.state.length - 1])}</td>
+            <td>{formatNumber(tc.state_change)}</td>
+            <td>{toPercent(tc.state_change_perc, 1)}%</td>
           </tr> 
           <tr className="trend-comparison-nation">
             <td>&#x25B2;</td>
             <td>Nation</td>
-            <td>{formatNumber(trendComparison.nation[0])}</td>
-            <td>{formatNumber(trendComparison.nation[trendComparison.nation.length - 1])}</td>
-            <td>{formatNumber(trendComparison.nation_change)}</td>
-            <td>{toPercent(trendComparison.nation_change_perc, 1)}%</td>
+            <td>{formatNumber(tc.nation[0])}</td>
+            <td>{formatNumber(tc.nation[tc.nation.length - 1])}</td>
+            <td>{formatNumber(tc.nation_change)}</td>
+            <td>{toPercent(tc.nation_change_perc, 1)}%</td>
           </tr> 
         </tbody>
       </table>
@@ -177,9 +156,14 @@ function EmployingIndustriesRow(props) {
 }
 
 function EmployingIndustries(props) {
-  const employingIndustries = props.data.employing_industries;
+  const ei = props.data.employing_industries;
   
-  const tableRows = employingIndustries.industries.map(industry => {
+  ei.industries.forEach(industry => {
+    industry.in_occupation_jobs_perc = industry.in_occupation_jobs / ei.jobs;
+    industry.jobs_perc = industry.in_occupation_jobs / industry.jobs;
+  });
+
+  const tableRows = ei.industries.map(industry => {
     return <EmployingIndustriesRow key={industry.title} industry={industry} />
   });
 
@@ -190,9 +174,9 @@ function EmployingIndustries(props) {
         <thead>
           <tr>
             <th>Industry</th>
-            <th>Occupation Jobs in Industry ({employingIndustries.year})</th>
-            <th>% of Occupation in Industry ({employingIndustries.year})</th>
-            <th>% of Total Jobs in Industry ({employingIndustries.year})</th>
+            <th>Occupation Jobs in Industry ({ei.year})</th>
+            <th>% of Occupation in Industry ({ei.year})</th>
+            <th>% of Total Jobs in Industry ({ei.year})</th>
           </tr>
         </thead>
         <tbody>
@@ -204,8 +188,8 @@ function EmployingIndustries(props) {
 }
 
 function App(props) {
-  const data = addMetrics(props.data);
-  
+  const data = props.data;
+
   return (
     <div>
       <Header data={data} />
