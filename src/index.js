@@ -1,5 +1,18 @@
 "use strict";
 
+const formatNumber = number => {
+  return number.toLocaleString("en-US", {maximumFractionDigits: 0});
+};
+
+const toPercent = (number, digits) => {
+  return (number * 100).toLocaleString("en-US", 
+    {minimumFractionDigits: digits, maximumFractionDigits: digits});
+};
+
+const toCurrency = number => {
+  return number.toLocaleString("en-US", {style: "currency", currency: "USD"});
+};
+
 function addMetrics(data) {
   data.summary.jobs.perc_diff = 
     (data.summary.jobs.regional - data.summary.jobs.national_avg)
@@ -34,39 +47,171 @@ function addMetrics(data) {
 }
 
 function Header(props) {
+  const data = props.data;
+
   return (
-    <div>
+    <header>
       <h1>Occupation Overview</h1>
-      <h2>{props.data.occupation.title} in {props.data.region.title}</h2>
-    </div>
+      <h2>{data.occupation.title} in {data.region.title}</h2>
+    </header>
   );
 }
 
 function Summary(props) {
+  const data = props.data;
+  const summary = data.summary;
+
   return (
-    <div></div>
+    <section className="summary">
+      <h3>Occupation Summary for {data.occupation.title}</h3>
+      <ul>
+        <li>
+          <p>{formatNumber(summary.jobs.regional)}</p>
+          <p>Jobs ({summary.jobs.year})</p>
+          <p>{toPercent(summary.jobs.perc_diff, 0)}% 
+            {summary.jobs.perc_diff >= 0 &&
+              <span className="green"> above </span> 
+            }
+            {summary.jobs.perc_diff < 0 &&
+              <span className="red"> below </span>
+            }
+            National average</p>
+        </li>
+        <li>
+          <p>
+            {summary.jobs_growth.regional >= 0 &&
+              <span className="green">+{summary.jobs_growth.regional}%</span>
+            }
+            {summary.jobs_growth.regional < 0 &&
+              <span className="red">-{summary.jobs_growth.regional}%</span>
+            } 
+          </p>
+          <p>
+            % Change ({summary.jobs_growth.start_year}-{summary.jobs_growth.end_year})
+          </p>
+          <p>Nation: 
+            {summary.jobs_growth.national_avg >= 0 &&
+              <span className="green"> +{summary.jobs_growth.national_avg}%</span>
+            }
+            {summary.jobs_growth.national_avg < 0 && 
+              <span className="red"> -{summary.jobs_growth.national_avg}%</span>
+            }
+          </p>
+        </li>
+        <li>
+          <p>{toCurrency(summary.earnings.regional)}/hr</p>
+          <p>Median Hourly Earnings</p>
+          <p>Nation: {toCurrency(summary.earnings.national_avg)}/hr</p>
+        </li>
+      </ul>
+    </section>
   );
 }
 
 function TrendComparison(props) {
+  const trendComparison = props.data.trend_comparison;
+
   return (
-    <div></div>
+    <section className="trend-comparison">
+      <h3>Regional Trends</h3>
+      <div className="trend-comparison-chart"></div>
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Region</th>
+            <th>{trendComparison.start_year} jobs</th>
+            <th>{trendComparison.end_year} jobs</th>
+            <th>Change</th>
+            <th>% Change</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr className="trend-comparison-region">
+            <td>&#x25CF;</td>
+            <td>Region</td>
+            <td>{formatNumber(trendComparison.regional[0])}</td>
+            <td>{formatNumber(trendComparison.regional[trendComparison.regional.length - 1])}</td>
+            <td>{formatNumber(trendComparison.regional_change)}</td>
+            <td>{toPercent(trendComparison.regional_change_perc, 1)}%</td>
+          </tr> 
+          <tr className="trend-comparison-state">
+            <td>&#x25A0;</td>
+            <td>State</td>
+            <td>{formatNumber(trendComparison.state[0])}</td>
+            <td>{formatNumber(trendComparison.state[trendComparison.state.length - 1])}</td>
+            <td>{formatNumber(trendComparison.state_change)}</td>
+            <td>{toPercent(trendComparison.state_change_perc, 1)}%</td>
+          </tr> 
+          <tr className="trend-comparison-nation">
+            <td>&#x25B2;</td>
+            <td>Nation</td>
+            <td>{formatNumber(trendComparison.nation[0])}</td>
+            <td>{formatNumber(trendComparison.nation[trendComparison.nation.length - 1])}</td>
+            <td>{formatNumber(trendComparison.nation_change)}</td>
+            <td>{toPercent(trendComparison.nation_change_perc, 1)}%</td>
+          </tr> 
+        </tbody>
+      </table>
+    </section>
+  );
+}
+
+function EmployingIndustriesRow(props) {
+  const industry = props.industry;
+
+  const inOccupationJobsPerc = industry.in_occupation_jobs_perc;
+  const divStyle = { background: "linear-gradient(" + 
+    "to right, " +
+    "lightblue " + toPercent(inOccupationJobsPerc, 0) + "%, " +
+    "white " + toPercent(inOccupationJobsPerc, 0) + "%)" };
+
+  return (
+    <tr style={divStyle} >
+      <td>&#x1F3E2; {industry.title}</td>
+      <td>{formatNumber(industry.in_occupation_jobs)}</td>
+      <td>{toPercent(industry.in_occupation_jobs_perc, 1)}%</td>
+      <td>{toPercent(industry.jobs_perc, 1)}%</td>
+    </tr>
   );
 }
 
 function EmployingIndustries(props) {
+  const employingIndustries = props.data.employing_industries;
+  
+  const tableRows = employingIndustries.industries.map(industry => {
+    return <EmployingIndustriesRow key={industry.title} industry={industry} />
+  });
+
   return (
-    <div></div>
+    <section className="employing-industries">
+      <h3>Industries Employing Computer Programmers</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Industry</th>
+            <th>Occupation Jobs in Industry ({employingIndustries.year})</th>
+            <th>% of Occupation in Industry ({employingIndustries.year})</th>
+            <th>% of Total Jobs in Industry ({employingIndustries.year})</th>
+          </tr>
+        </thead>
+        <tbody>
+          {tableRows}
+        </tbody>
+      </table>
+    </section>
   );
 }
 
 function App(props) {
+  const data = addMetrics(props.data);
+  
   return (
     <div>
-      <Header data={props.data} />
-      <Summary data={props.data} />
-      <TrendComparison data={props.data} />
-      <EmployingIndustries data={props.data} />
+      <Header data={data} />
+      <Summary data={data} />
+      <TrendComparison data={data} />
+      <EmployingIndustries data={data} />
     </div>
   );
 }
@@ -102,171 +247,4 @@ document.addEventListener("DOMContentLoaded", _event => {
     .catch(error => console.log(error));
 });
 
-/*
-  <header>
-  </header>
-  <main>
-    <div id="summary-root">
-    </div>
-    <div id="trend-comparison-root">
-    </div>
-    <div id="employing-industries-root">
-    </div>
-  </main>
 
-  <script id="headerTemplate" type="text/x-handlebars-template">
-    <h1>Occupation Overview</h1>
-    <h2>{{occupation.title}} in {{region.title}}</h2>
-  </script>
-
-  <script id="summaryTemplate" type="text/x-handlebars-template">
-    <section class="summary">
-      <h3>Occupation Summary for {{occupation.title}}</h3>
-      <ul>
-        <li>
-          <p>{{formatNumber summary.jobs.regional}}</p>
-          <p>Jobs ({{summary.jobs.year}})</p>
-          <p>{{toPercent summary.jobs.perc_diff}}% 
-            {{#if (isPositive summary.jobs.perc_diff)}}
-              <span class="green">above</span> 
-            {{else}}
-              <span class="red">below</span>
-            {{/if}}
-            National average</p>
-        </li><!--
-        --><li>
-          <p>
-            {{#if (isPositive summary.jobs_growth.regional)}}
-              <span class="green">+{{summary.jobs_growth.regional}}%</span>
-            {{else}}
-              <span class="red">-{{summary.jobs_growth.regional}}%</span>
-            {{/if}} 
-          </p>
-          <p>
-            % Change ({{summary.jobs_growth.start_year}}-{{summary.jobs_growth.end_year}})
-          </p>
-          <p>Nation: 
-            {{#if (isPositive summary.jobs_growth.national_avg)}}
-              <span class="green">+{{summary.jobs_growth.national_avg}}%</span>
-            {{else}}
-              <span class="red">{{summary.jobs_growth.national_avg}}%</span>
-            {{/if}}
-          </p>
-        </li><!--
-        --><li>
-          <p>${{summary.earnings.regional}}/hr</p>
-          <p>Median Hourly Earnings</p>
-          <p>Nation: ${{summary.earnings.national_avg}}/hr</p>
-        </li>
-      </ul>
-    </section>
-  </script>
-
-  <script id="trendComparisonTemplate" type="text/x-handlebars-template">
-    <section class="trend-comparison">
-      <h3>Regional Trends</h3>
-      <div class="trend-comparison-chart"></div>
-      <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th>Region</th>
-            <th>{{trend_comparison.start_year}} jobs</th>
-            <th>{{trend_comparison.end_year}} jobs</th>
-            <th>Change</th>
-            <th>% Change</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="trend-comparison-region">
-            <td>&#x25CF;</td>
-            <td>Region</td>
-            <td>{{formatNumber trend_comparison.regional.[0]}}</td>
-            <td>{{formatNumber (lastElement trend_comparison.regional)}}</td>
-            <td>{{formatNumber trend_comparison.regional_change}}</td>
-            <td>{{toPercent trend_comparison.regional_change_perc}}%</td>
-          </tr> 
-          <tr class="trend-comparison-state">
-            <td>&#x25A0;</td>
-            <td>State</td>
-            <td>{{formatNumber trend_comparison.state.[0]}}</td>
-            <td>{{formatNumber (lastElement trend_comparison.state)}}</td>
-            <td>{{formatNumber trend_comparison.state_change}}</td>
-            <td>{{toPercent trend_comparison.state_change_perc}}%</td>
-          </tr> 
-          <tr class="trend-comparison-nation">
-            <td>&#x25B2;</td>
-            <td>Nation</td>
-            <td>{{formatNumber trend_comparison.nation.[0]}}</td>
-            <td>{{formatNumber (lastElement trend_comparison.nation)}}</td>
-            <td>{{formatNumber trend_comparison.nation_change}}</td>
-            <td>{{toPercent trend_comparison.nation_change_perc}}%</td>
-          </tr> 
-        </tbody>
-      </table>
-    </section>
-  </script>
-
-  <script id="employingIndustriesTemplate" type="text/x-handlebars-template">
-    <section class="employing-industries">
-      <h3>Industries Employing Computer Programmers</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Industry</th>
-            <th>Occupation Jobs in Industry ({{employing_industries.year}})</th>
-            <th>% of Occupation in Industry ({{employing_industries.year}})</th>
-            <th>% of Total Jobs in Industry ({{employing_industries.year}})</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr style="background: linear-gradient(
-            to right, 
-            lightblue {{toPercent employing_industries.industries.[0].in_occupation_jobs_perc}}%, 
-            white {{toPercent employing_industries.industries.[0].in_occupation_jobs_perc}}%);">
-            <td>&#x1F3E2 {{employing_industries.industries.[0].title}}</td>
-            <td>{{formatNumber employing_industries.industries.[0].in_occupation_jobs}}</td>
-            <td>{{toPercent employing_industries.industries.[0].in_occupation_jobs_perc}}%</td>
-            <td>{{toPercent employing_industries.industries.[0].jobs_perc}}%</td>
-          </tr>
-          <tr style="background: linear-gradient(
-            to right, 
-            lightblue {{toPercent employing_industries.industries.[1].in_occupation_jobs_perc}}%, 
-            white {{toPercent employing_industries.industries.[1].in_occupation_jobs_perc}}%);">
-            <td>&#x1F3E2 {{employing_industries.industries.[1].title}}</td>
-            <td>{{formatNumber employing_industries.industries.[1].in_occupation_jobs}}</td>
-            <td>{{toPercent employing_industries.industries.[1].in_occupation_jobs_perc}}%</td>
-            <td>{{toPercent employing_industries.industries.[1].jobs_perc}}%</td>
-          </tr>
-          <tr style="background: linear-gradient(
-            to right, 
-            lightblue {{toPercent employing_industries.industries.[2].in_occupation_jobs_perc}}%, 
-            white {{toPercent employing_industries.industries.[2].in_occupation_jobs_perc}}%);">
-            <td>&#x1F3E2 {{employing_industries.industries.[2].title}}</td>
-            <td>{{formatNumber employing_industries.industries.[2].in_occupation_jobs}}</td>
-            <td>{{toPercent employing_industries.industries.[2].in_occupation_jobs_perc}}%</td>
-            <td>{{toPercent employing_industries.industries.[2].jobs_perc}}%</td>
-          </tr>
-          <tr style="background: linear-gradient(
-            to right, 
-            lightblue {{toPercent employing_industries.industries.[3].in_occupation_jobs_perc}}%, 
-            white {{toPercent employing_industries.industries.[3].in_occupation_jobs_perc}}%);">
-            <td>&#x1F3E2 {{employing_industries.industries.[3].title}}</td>
-            <td>{{formatNumber employing_industries.industries.[3].in_occupation_jobs}}</td>
-            <td>{{toPercent employing_industries.industries.[3].in_occupation_jobs_perc}}%</td>
-            <td>{{toPercent employing_industries.industries.[3].jobs_perc}}%</td>
-          </tr>
-          <tr style="background: linear-gradient(
-            to right, 
-            lightblue {{toPercent employing_industries.industries.[4].in_occupation_jobs_perc}}%, 
-            white {{toPercent employing_industries.industries.[4].in_occupation_jobs_perc}}%);">
-            <td>&#x1F3E2 {{employing_industries.industries.[4].title}}</td>
-            <td>{{formatNumber employing_industries.industries.[4].in_occupation_jobs}}</td>
-            <td>{{toPercent employing_industries.industries.[4].in_occupation_jobs_perc}}%</td>
-            <td>{{toPercent employing_industries.industries.[4].jobs_perc}}%</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-  </script>
-*/
