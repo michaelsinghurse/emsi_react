@@ -229,6 +229,8 @@ function EmployingIndustriesRow(props) {
 function EmployingIndustries(props) {
   const ei = props.data.employing_industries;
  
+  ei.industries.sort((a, b) => b.in_occupation_jobs - a.in_occupation_jobs);
+
   ei.industries.forEach(industry => {
     industry.in_occupation_jobs_perc = industry.in_occupation_jobs / ei.jobs;
     industry.jobs_perc = industry.in_occupation_jobs / industry.jobs;

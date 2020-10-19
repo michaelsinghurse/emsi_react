@@ -108,7 +108,6 @@ function Summary(props) {
           summary.jobs_growth.regional < 0 && React.createElement(
             "span",
             { className: "red" },
-            "-",
             summary.jobs_growth.regional,
             "%"
           )
@@ -136,7 +135,7 @@ function Summary(props) {
           summary.jobs_growth.national_avg < 0 && React.createElement(
             "span",
             { className: "red" },
-            " -",
+            " ",
             summary.jobs_growth.national_avg,
             "%"
           )
@@ -461,6 +460,10 @@ function EmployingIndustriesRow(props) {
 
 function EmployingIndustries(props) {
   var ei = props.data.employing_industries;
+
+  ei.industries.sort(function (a, b) {
+    return b.in_occupation_jobs - a.in_occupation_jobs;
+  });
 
   ei.industries.forEach(function (industry) {
     industry.in_occupation_jobs_perc = industry.in_occupation_jobs / ei.jobs;
