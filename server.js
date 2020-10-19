@@ -15,6 +15,8 @@ app.use(morgan("dev"));
 // Direct requests for static resources to the `public` folder
 app.use("/", express.static(path.join(__dirname, "public")));
 
+app.use("/scripts", express.static(path.join(__dirname, "node_modules")));
+
 // Parse `application/json` data on requests. Data will then be available on 
 // `req.body` object
 app.use(express.json());
