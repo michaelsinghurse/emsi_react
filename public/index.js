@@ -188,37 +188,52 @@ var TrendComparison = function (_React$Component) {
 
       var percChangeArray = function percChangeArray(array) {
         return array.map(function (value, index) {
-          if (index === 0) {
-            return 0;
-          }
           var startValue = array[0];
           return toPercent((value - startValue) / startValue);
         });
+      };
+
+      var yearArray = function yearArray(start, end) {
+        var years = [];
+        while (start <= end) {
+          years.push(start);
+          start += 1;
+        }
+        return years;
       };
 
       var ctx = document.querySelector(".trend-comparison-chart");
       var myChart = new Chart(ctx, {
         type: "line",
         data: {
-          labels: [2013, 2014, 2015, 2016, 2017, 2018],
+          labels: yearArray(tc.start_year, tc.end_year),
           datasets: [{
-            label: "Regional",
             backgroundColor: "#000000",
             borderColor: "#000000",
+            data: percChangeArray(tc.regional),
             fill: false,
-            data: percChangeArray(tc.regional)
+            label: "Regional",
+            lineTension: 0,
+            pointRadius: 6,
+            pointStyle: "circle"
           }, {
-            label: "State",
             backgroundColor: "#4169E1",
             borderColor: "#4169E1",
+            data: percChangeArray(tc.state),
             fill: false,
-            data: percChangeArray(tc.state)
+            label: "State",
+            lineTension: 0,
+            pointRadius: 6,
+            pointStyle: "rect"
           }, {
-            label: "Nation",
             backgroundColor: "#ADD8E6",
             borderColor: "#ADD8E6",
+            data: percChangeArray(tc.nation),
             fill: false,
-            data: percChangeArray(tc.nation)
+            label: "Nation",
+            lineTension: 0,
+            pointRadius: 6,
+            pointStyle: "triangle"
           }]
         },
         options: {

@@ -91,37 +91,55 @@ class TrendComparison extends React.Component {
     
     const percChangeArray = array => {
       return array.map((value, index) => {
-        if (index === 0) {
-          return 0;
-        }
         const startValue = array[0];
         return toPercent((value - startValue) / startValue);
       });
+    };
+    
+    const yearArray = (start, end) => {
+      const years = [];
+      while (start <= end) {
+        years.push(start);
+        start += 1;
+      }
+      return years;
     };
 
     const ctx = document.querySelector(".trend-comparison-chart");
     const myChart = new Chart(ctx, {
       type: "line",
       data: {
-        labels: [2013, 2014, 2015, 2016, 2017, 2018],
+        labels: yearArray(tc.start_year, tc.end_year),
         datasets: [{
-          label: "Regional",
           backgroundColor: "#000000",
           borderColor: "#000000",
-          fill: false,
           data: percChangeArray(tc.regional),
+          fill: false,
+          label: "Regional",
+          lineTension: 0,
+          pointRadius: 6,
+          pointStyle: "circle"
+          yAxisID: "y",
         }, {
-          label: "State",
           backgroundColor: "#4169E1",
           borderColor: "#4169E1",
-          fill: false,
           data: percChangeArray(tc.state),
+          fill: false,
+          label: "State",
+          lineTension: 0,
+          pointRadius: 6,
+          pointStyle: "rect",
+          yAxisID: "y",
         }, {
-          label: "Nation",
           backgroundColor: "#ADD8E6",
           borderColor: "#ADD8E6",
-          fill: false,
           data: percChangeArray(tc.nation),
+          fill: false,
+          label: "Nation",
+          lineTension: 0,
+          pointRadius: 6,
+          pointStyle: "triangle",
+          yAxisID: "y",
         }],
       },
       options: {
@@ -129,19 +147,14 @@ class TrendComparison extends React.Component {
           display: false,
         },
         scales: {
-          x: {
-            display: true,
-            scaleLabel: {
-              display: true,
-              labelString: "Year",
-            },
-          },
           y: {
             display: true,
+            position: "left",
             scaleLabel: {
               display: true,
               labelString: "Percent Change",
             },
+            type: "linear",
           },
         },
       },
