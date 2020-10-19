@@ -79,9 +79,9 @@ section {
 }
 
 .trend-comparison-chart {
-  height: 400px;
-  width: 100%;
-  background-color: gainsboro;
+  max-height: 400px;
+  max-width: 100%;
+  /*background-color: gainsboro;*/
   margin: 10px 0;
 }
 

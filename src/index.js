@@ -78,62 +78,133 @@ function Summary(props) {
   );
 }
 
-function TrendComparison(props) {
-  const tc = props.data.trend_comparison;
+class TrendComparison extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      trendComparison: props.data.trend_comparison,
+    };
+  }
+  
+  componentDidMount() {
+    const tc = this.state.trendComparison;
+    
+    const percChangeArray = array => {
+      return array.map((value, index) => {
+        if (index === 0) {
+          return 0;
+        }
+        const startValue = array[0];
+        return toPercent((value - startValue) / startValue);
+      });
+    };
 
-  tc.regional_change = tc.regional[tc.regional.length - 1] - tc.regional[0];
-  tc.regional_change_perc = tc.regional_change / tc.regional[0];
+    const ctx = document.querySelector(".trend-comparison-chart");
+    const myChart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: [2013, 2014, 2015, 2016, 2017, 2018],
+        datasets: [{
+          label: "Regional",
+          backgroundColor: "#000000",
+          borderColor: "#000000",
+          fill: false,
+          data: percChangeArray(tc.regional),
+        }, {
+          label: "State",
+          backgroundColor: "#4169E1",
+          borderColor: "#4169E1",
+          fill: false,
+          data: percChangeArray(tc.state),
+        }, {
+          label: "Nation",
+          backgroundColor: "#ADD8E6",
+          borderColor: "#ADD8E6",
+          fill: false,
+          data: percChangeArray(tc.nation),
+        }],
+      },
+      options: {
+        legend: {
+          display: false,
+        },
+        scales: {
+          x: {
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: "Year",
+            },
+          },
+          y: {
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: "Percent Change",
+            },
+          },
+        },
+      },
+    });
+  }
+  
+  render() {
+    const tc = this.state.trendComparison;
 
-  tc.state_change = tc.state[tc.state.length - 1] - tc.state[0];
-  tc.state_change_perc = tc.state_change / tc.state[0];
+    tc.regional_change = tc.regional[tc.regional.length - 1] - tc.regional[0];
+    tc.regional_change_perc = tc.regional_change / tc.regional[0];
 
-  tc.nation_change = tc.nation[tc.nation.length - 1] - tc.nation[0];
-  tc.nation_change_perc = tc.nation_change / tc.nation[0];
+    tc.state_change = tc.state[tc.state.length - 1] - tc.state[0];
+    tc.state_change_perc = tc.state_change / tc.state[0];
 
-  return (
-    <section className="trend-comparison">
-      <h3>Regional Trends</h3>
-      <div className="trend-comparison-chart"></div>
-      <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th>Region</th>
-            <th>{tc.start_year} jobs</th>
-            <th>{tc.end_year} jobs</th>
-            <th>Change</th>
-            <th>% Change</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr className="trend-comparison-region">
-            <td>&#x25CF;</td>
-            <td>Region</td>
-            <td>{formatNumber(tc.regional[0])}</td>
-            <td>{formatNumber(tc.regional[tc.regional.length - 1])}</td>
-            <td>{formatNumber(tc.regional_change)}</td>
-            <td>{toPercent(tc.regional_change_perc, 1)}%</td>
-          </tr> 
-          <tr className="trend-comparison-state">
-            <td>&#x25A0;</td>
-            <td>State</td>
-            <td>{formatNumber(tc.state[0])}</td>
-            <td>{formatNumber(tc.state[tc.state.length - 1])}</td>
-            <td>{formatNumber(tc.state_change)}</td>
-            <td>{toPercent(tc.state_change_perc, 1)}%</td>
-          </tr> 
-          <tr className="trend-comparison-nation">
-            <td>&#x25B2;</td>
-            <td>Nation</td>
-            <td>{formatNumber(tc.nation[0])}</td>
-            <td>{formatNumber(tc.nation[tc.nation.length - 1])}</td>
-            <td>{formatNumber(tc.nation_change)}</td>
-            <td>{toPercent(tc.nation_change_perc, 1)}%</td>
-          </tr> 
-        </tbody>
-      </table>
-    </section>
-  );
+    tc.nation_change = tc.nation[tc.nation.length - 1] - tc.nation[0];
+    tc.nation_change_perc = tc.nation_change / tc.nation[0];
+
+    return (
+      <section className="trend-comparison">
+        <h3>Regional Trends</h3>
+        <canvas className="trend-comparison-chart"></canvas>
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Region</th>
+              <th>{tc.start_year} jobs</th>
+              <th>{tc.end_year} jobs</th>
+              <th>Change</th>
+              <th>% Change</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="trend-comparison-region">
+              <td>&#x25CF;</td>
+              <td>Region</td>
+              <td>{formatNumber(tc.regional[0])}</td>
+              <td>{formatNumber(tc.regional[tc.regional.length - 1])}</td>
+              <td>{formatNumber(tc.regional_change)}</td>
+              <td>{toPercent(tc.regional_change_perc, 1)}%</td>
+            </tr> 
+            <tr className="trend-comparison-state">
+              <td>&#x25A0;</td>
+              <td>State</td>
+              <td>{formatNumber(tc.state[0])}</td>
+              <td>{formatNumber(tc.state[tc.state.length - 1])}</td>
+              <td>{formatNumber(tc.state_change)}</td>
+              <td>{toPercent(tc.state_change_perc, 1)}%</td>
+            </tr> 
+            <tr className="trend-comparison-nation">
+              <td>&#x25B2;</td>
+              <td>Nation</td>
+              <td>{formatNumber(tc.nation[0])}</td>
+              <td>{formatNumber(tc.nation[tc.nation.length - 1])}</td>
+              <td>{formatNumber(tc.nation_change)}</td>
+              <td>{toPercent(tc.nation_change_perc, 1)}%</td>
+            </tr> 
+          </tbody>
+        </table>
+      </section>
+    );
+  }
 }
 
 function EmployingIndustriesRow(props) {
