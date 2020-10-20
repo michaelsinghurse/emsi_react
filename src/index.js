@@ -78,30 +78,19 @@ function Summary(props) {
   );
 }
 
-// TODO: move chart logic to this class.
 class TrendComparisonChart extends React.Component {
-  componentDidMount() {
-
-  }
-
-  render() {
-
-  }
-}
-
-class TrendComparison extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      trendComparison: props.data.trend_comparison,
+      trendComparison: props.data,
     };
   }
-  
+
   componentDidMount() {
     const tc = this.state.trendComparison;
     
     const percChangeArray = array => {
-      return array.map((value, index) => {
+      return array.map(value => {
         const startValue = array[0];
         return toPercent((value - startValue) / startValue);
       });
@@ -109,9 +98,10 @@ class TrendComparison extends React.Component {
     
     const yearArray = (start, end) => {
       const years = [];
-      while (start <= end) {
-        years.push(start);
-        start += 1;
+      let year = start;
+      while (year <= end) {
+        years.push(year);
+        year += 1;
       }
       return years;
     };
@@ -188,64 +178,70 @@ class TrendComparison extends React.Component {
       },
     });
   }
-  
+
   render() {
-    const tc = this.state.trendComparison;
-
-    tc.regional_change = tc.regional[tc.regional.length - 1] - tc.regional[0];
-    tc.regional_change_perc = tc.regional_change / tc.regional[0];
-
-    tc.state_change = tc.state[tc.state.length - 1] - tc.state[0];
-    tc.state_change_perc = tc.state_change / tc.state[0];
-
-    tc.nation_change = tc.nation[tc.nation.length - 1] - tc.nation[0];
-    tc.nation_change_perc = tc.nation_change / tc.nation[0];
-
     return (
-      <section className="trend-comparison">
-        <h3>Regional Trends</h3>
-        <canvas className="trend-comparison-chart"></canvas>
-        <table>
-          <thead>
-            <tr>
-              <th></th>
-              <th>Region</th>
-              <th>{tc.start_year} jobs</th>
-              <th>{tc.end_year} jobs</th>
-              <th>Change</th>
-              <th>% Change</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="trend-comparison-region">
-              <td>&#x25CF;</td>
-              <td>Region</td>
-              <td>{formatNumber(tc.regional[0])}</td>
-              <td>{formatNumber(tc.regional[tc.regional.length - 1])}</td>
-              <td>{formatNumber(tc.regional_change)}</td>
-              <td>{toPercent(tc.regional_change_perc, 1)}%</td>
-            </tr> 
-            <tr className="trend-comparison-state">
-              <td>&#x25A0;</td>
-              <td>State</td>
-              <td>{formatNumber(tc.state[0])}</td>
-              <td>{formatNumber(tc.state[tc.state.length - 1])}</td>
-              <td>{formatNumber(tc.state_change)}</td>
-              <td>{toPercent(tc.state_change_perc, 1)}%</td>
-            </tr> 
-            <tr className="trend-comparison-nation">
-              <td>&#x25B2;</td>
-              <td>Nation</td>
-              <td>{formatNumber(tc.nation[0])}</td>
-              <td>{formatNumber(tc.nation[tc.nation.length - 1])}</td>
-              <td>{formatNumber(tc.nation_change)}</td>
-              <td>{toPercent(tc.nation_change_perc, 1)}%</td>
-            </tr> 
-          </tbody>
-        </table>
-      </section>
+      <canvas className="trend-comparison-chart"></canvas>
     );
   }
+}
+
+function TrendComparison(props) {
+  const tc = props.data.trend_comparison;
+
+  tc.regional_change = tc.regional[tc.regional.length - 1] - tc.regional[0];
+  tc.regional_change_perc = tc.regional_change / tc.regional[0];
+
+  tc.state_change = tc.state[tc.state.length - 1] - tc.state[0];
+  tc.state_change_perc = tc.state_change / tc.state[0];
+
+  tc.nation_change = tc.nation[tc.nation.length - 1] - tc.nation[0];
+  tc.nation_change_perc = tc.nation_change / tc.nation[0];
+
+  return (
+    <section className="trend-comparison">
+      <h3>Regional Trends</h3>
+      <TrendComparisonChart data={tc} />
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Region</th>
+            <th>{tc.start_year} jobs</th>
+            <th>{tc.end_year} jobs</th>
+            <th>Change</th>
+            <th>% Change</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr className="trend-comparison-region">
+            <td>&#x25CF;</td>
+            <td>Region</td>
+            <td>{formatNumber(tc.regional[0])}</td>
+            <td>{formatNumber(tc.regional[tc.regional.length - 1])}</td>
+            <td>{formatNumber(tc.regional_change)}</td>
+            <td>{toPercent(tc.regional_change_perc, 1)}%</td>
+          </tr> 
+          <tr className="trend-comparison-state">
+            <td>&#x25A0;</td>
+            <td>State</td>
+            <td>{formatNumber(tc.state[0])}</td>
+            <td>{formatNumber(tc.state[tc.state.length - 1])}</td>
+            <td>{formatNumber(tc.state_change)}</td>
+            <td>{toPercent(tc.state_change_perc, 1)}%</td>
+          </tr> 
+          <tr className="trend-comparison-nation">
+            <td>&#x25B2;</td>
+            <td>Nation</td>
+            <td>{formatNumber(tc.nation[0])}</td>
+            <td>{formatNumber(tc.nation[tc.nation.length - 1])}</td>
+            <td>{formatNumber(tc.nation_change)}</td>
+            <td>{toPercent(tc.nation_change_perc, 1)}%</td>
+          </tr> 
+        </tbody>
+      </table>
+    </section>
+  );
 }
 
 function EmployingIndustriesRow(props) {

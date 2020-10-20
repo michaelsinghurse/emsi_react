@@ -167,49 +167,27 @@ function Summary(props) {
   );
 }
 
-// TODO: move chart logic to this class.
-
 var TrendComparisonChart = function (_React$Component) {
   _inherits(TrendComparisonChart, _React$Component);
 
-  function TrendComparisonChart() {
+  function TrendComparisonChart(props) {
     _classCallCheck(this, TrendComparisonChart);
 
-    return _possibleConstructorReturn(this, (TrendComparisonChart.__proto__ || Object.getPrototypeOf(TrendComparisonChart)).apply(this, arguments));
+    var _this = _possibleConstructorReturn(this, (TrendComparisonChart.__proto__ || Object.getPrototypeOf(TrendComparisonChart)).call(this, props));
+
+    _this.state = {
+      trendComparison: props.data
+    };
+    return _this;
   }
 
   _createClass(TrendComparisonChart, [{
-    key: "componentDidMount",
-    value: function componentDidMount() {}
-  }, {
-    key: "render",
-    value: function render() {}
-  }]);
-
-  return TrendComparisonChart;
-}(React.Component);
-
-var TrendComparison = function (_React$Component2) {
-  _inherits(TrendComparison, _React$Component2);
-
-  function TrendComparison(props) {
-    _classCallCheck(this, TrendComparison);
-
-    var _this2 = _possibleConstructorReturn(this, (TrendComparison.__proto__ || Object.getPrototypeOf(TrendComparison)).call(this, props));
-
-    _this2.state = {
-      trendComparison: props.data.trend_comparison
-    };
-    return _this2;
-  }
-
-  _createClass(TrendComparison, [{
     key: "componentDidMount",
     value: function componentDidMount() {
       var tc = this.state.trendComparison;
 
       var percChangeArray = function percChangeArray(array) {
-        return array.map(function (value, index) {
+        return array.map(function (value) {
           var startValue = array[0];
           return toPercent((value - startValue) / startValue);
         });
@@ -217,9 +195,10 @@ var TrendComparison = function (_React$Component2) {
 
       var yearArray = function yearArray(start, end) {
         var years = [];
-        while (start <= end) {
-          years.push(start);
-          start += 1;
+        var year = start;
+        while (year <= end) {
+          years.push(year);
+          year += 1;
         }
         return years;
       };
@@ -299,181 +278,185 @@ var TrendComparison = function (_React$Component2) {
   }, {
     key: "render",
     value: function render() {
-      var tc = this.state.trendComparison;
-
-      tc.regional_change = tc.regional[tc.regional.length - 1] - tc.regional[0];
-      tc.regional_change_perc = tc.regional_change / tc.regional[0];
-
-      tc.state_change = tc.state[tc.state.length - 1] - tc.state[0];
-      tc.state_change_perc = tc.state_change / tc.state[0];
-
-      tc.nation_change = tc.nation[tc.nation.length - 1] - tc.nation[0];
-      tc.nation_change_perc = tc.nation_change / tc.nation[0];
-
-      return React.createElement(
-        "section",
-        { className: "trend-comparison" },
-        React.createElement(
-          "h3",
-          null,
-          "Regional Trends"
-        ),
-        React.createElement("canvas", { className: "trend-comparison-chart" }),
-        React.createElement(
-          "table",
-          null,
-          React.createElement(
-            "thead",
-            null,
-            React.createElement(
-              "tr",
-              null,
-              React.createElement("th", null),
-              React.createElement(
-                "th",
-                null,
-                "Region"
-              ),
-              React.createElement(
-                "th",
-                null,
-                tc.start_year,
-                " jobs"
-              ),
-              React.createElement(
-                "th",
-                null,
-                tc.end_year,
-                " jobs"
-              ),
-              React.createElement(
-                "th",
-                null,
-                "Change"
-              ),
-              React.createElement(
-                "th",
-                null,
-                "% Change"
-              )
-            )
-          ),
-          React.createElement(
-            "tbody",
-            null,
-            React.createElement(
-              "tr",
-              { className: "trend-comparison-region" },
-              React.createElement(
-                "td",
-                null,
-                "\u25CF"
-              ),
-              React.createElement(
-                "td",
-                null,
-                "Region"
-              ),
-              React.createElement(
-                "td",
-                null,
-                formatNumber(tc.regional[0])
-              ),
-              React.createElement(
-                "td",
-                null,
-                formatNumber(tc.regional[tc.regional.length - 1])
-              ),
-              React.createElement(
-                "td",
-                null,
-                formatNumber(tc.regional_change)
-              ),
-              React.createElement(
-                "td",
-                null,
-                toPercent(tc.regional_change_perc, 1),
-                "%"
-              )
-            ),
-            React.createElement(
-              "tr",
-              { className: "trend-comparison-state" },
-              React.createElement(
-                "td",
-                null,
-                "\u25A0"
-              ),
-              React.createElement(
-                "td",
-                null,
-                "State"
-              ),
-              React.createElement(
-                "td",
-                null,
-                formatNumber(tc.state[0])
-              ),
-              React.createElement(
-                "td",
-                null,
-                formatNumber(tc.state[tc.state.length - 1])
-              ),
-              React.createElement(
-                "td",
-                null,
-                formatNumber(tc.state_change)
-              ),
-              React.createElement(
-                "td",
-                null,
-                toPercent(tc.state_change_perc, 1),
-                "%"
-              )
-            ),
-            React.createElement(
-              "tr",
-              { className: "trend-comparison-nation" },
-              React.createElement(
-                "td",
-                null,
-                "\u25B2"
-              ),
-              React.createElement(
-                "td",
-                null,
-                "Nation"
-              ),
-              React.createElement(
-                "td",
-                null,
-                formatNumber(tc.nation[0])
-              ),
-              React.createElement(
-                "td",
-                null,
-                formatNumber(tc.nation[tc.nation.length - 1])
-              ),
-              React.createElement(
-                "td",
-                null,
-                formatNumber(tc.nation_change)
-              ),
-              React.createElement(
-                "td",
-                null,
-                toPercent(tc.nation_change_perc, 1),
-                "%"
-              )
-            )
-          )
-        )
-      );
+      return React.createElement("canvas", { className: "trend-comparison-chart" });
     }
   }]);
 
-  return TrendComparison;
+  return TrendComparisonChart;
 }(React.Component);
+
+function TrendComparison(props) {
+  var tc = props.data.trend_comparison;
+
+  tc.regional_change = tc.regional[tc.regional.length - 1] - tc.regional[0];
+  tc.regional_change_perc = tc.regional_change / tc.regional[0];
+
+  tc.state_change = tc.state[tc.state.length - 1] - tc.state[0];
+  tc.state_change_perc = tc.state_change / tc.state[0];
+
+  tc.nation_change = tc.nation[tc.nation.length - 1] - tc.nation[0];
+  tc.nation_change_perc = tc.nation_change / tc.nation[0];
+
+  return React.createElement(
+    "section",
+    { className: "trend-comparison" },
+    React.createElement(
+      "h3",
+      null,
+      "Regional Trends"
+    ),
+    React.createElement(TrendComparisonChart, { data: tc }),
+    React.createElement(
+      "table",
+      null,
+      React.createElement(
+        "thead",
+        null,
+        React.createElement(
+          "tr",
+          null,
+          React.createElement("th", null),
+          React.createElement(
+            "th",
+            null,
+            "Region"
+          ),
+          React.createElement(
+            "th",
+            null,
+            tc.start_year,
+            " jobs"
+          ),
+          React.createElement(
+            "th",
+            null,
+            tc.end_year,
+            " jobs"
+          ),
+          React.createElement(
+            "th",
+            null,
+            "Change"
+          ),
+          React.createElement(
+            "th",
+            null,
+            "% Change"
+          )
+        )
+      ),
+      React.createElement(
+        "tbody",
+        null,
+        React.createElement(
+          "tr",
+          { className: "trend-comparison-region" },
+          React.createElement(
+            "td",
+            null,
+            "\u25CF"
+          ),
+          React.createElement(
+            "td",
+            null,
+            "Region"
+          ),
+          React.createElement(
+            "td",
+            null,
+            formatNumber(tc.regional[0])
+          ),
+          React.createElement(
+            "td",
+            null,
+            formatNumber(tc.regional[tc.regional.length - 1])
+          ),
+          React.createElement(
+            "td",
+            null,
+            formatNumber(tc.regional_change)
+          ),
+          React.createElement(
+            "td",
+            null,
+            toPercent(tc.regional_change_perc, 1),
+            "%"
+          )
+        ),
+        React.createElement(
+          "tr",
+          { className: "trend-comparison-state" },
+          React.createElement(
+            "td",
+            null,
+            "\u25A0"
+          ),
+          React.createElement(
+            "td",
+            null,
+            "State"
+          ),
+          React.createElement(
+            "td",
+            null,
+            formatNumber(tc.state[0])
+          ),
+          React.createElement(
+            "td",
+            null,
+            formatNumber(tc.state[tc.state.length - 1])
+          ),
+          React.createElement(
+            "td",
+            null,
+            formatNumber(tc.state_change)
+          ),
+          React.createElement(
+            "td",
+            null,
+            toPercent(tc.state_change_perc, 1),
+            "%"
+          )
+        ),
+        React.createElement(
+          "tr",
+          { className: "trend-comparison-nation" },
+          React.createElement(
+            "td",
+            null,
+            "\u25B2"
+          ),
+          React.createElement(
+            "td",
+            null,
+            "Nation"
+          ),
+          React.createElement(
+            "td",
+            null,
+            formatNumber(tc.nation[0])
+          ),
+          React.createElement(
+            "td",
+            null,
+            formatNumber(tc.nation[tc.nation.length - 1])
+          ),
+          React.createElement(
+            "td",
+            null,
+            formatNumber(tc.nation_change)
+          ),
+          React.createElement(
+            "td",
+            null,
+            toPercent(tc.nation_change_perc, 1),
+            "%"
+          )
+        )
+      )
+    )
+  );
+}
 
 function EmployingIndustriesRow(props) {
   var industry = props.industry;
