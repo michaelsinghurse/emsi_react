@@ -167,18 +167,40 @@ function Summary(props) {
   );
 }
 
-var TrendComparison = function (_React$Component) {
-  _inherits(TrendComparison, _React$Component);
+// TODO: move chart logic to this class.
+
+var TrendComparisonChart = function (_React$Component) {
+  _inherits(TrendComparisonChart, _React$Component);
+
+  function TrendComparisonChart() {
+    _classCallCheck(this, TrendComparisonChart);
+
+    return _possibleConstructorReturn(this, (TrendComparisonChart.__proto__ || Object.getPrototypeOf(TrendComparisonChart)).apply(this, arguments));
+  }
+
+  _createClass(TrendComparisonChart, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {}
+  }, {
+    key: "render",
+    value: function render() {}
+  }]);
+
+  return TrendComparisonChart;
+}(React.Component);
+
+var TrendComparison = function (_React$Component2) {
+  _inherits(TrendComparison, _React$Component2);
 
   function TrendComparison(props) {
     _classCallCheck(this, TrendComparison);
 
-    var _this = _possibleConstructorReturn(this, (TrendComparison.__proto__ || Object.getPrototypeOf(TrendComparison)).call(this, props));
+    var _this2 = _possibleConstructorReturn(this, (TrendComparison.__proto__ || Object.getPrototypeOf(TrendComparison)).call(this, props));
 
-    _this.state = {
+    _this2.state = {
       trendComparison: props.data.trend_comparison
     };
-    return _this;
+    return _this2;
   }
 
   _createClass(TrendComparison, [{
@@ -215,7 +237,8 @@ var TrendComparison = function (_React$Component) {
             label: "Regional",
             lineTension: 0,
             pointRadius: 6,
-            pointStyle: "circle"
+            pointStyle: "circle",
+            yAxisID: "y"
           }, {
             backgroundColor: "#4169E1",
             borderColor: "#4169E1",
@@ -224,7 +247,8 @@ var TrendComparison = function (_React$Component) {
             label: "State",
             lineTension: 0,
             pointRadius: 6,
-            pointStyle: "rect"
+            pointStyle: "rect",
+            yAxisID: "y"
           }, {
             backgroundColor: "#ADD8E6",
             borderColor: "#ADD8E6",
@@ -233,7 +257,8 @@ var TrendComparison = function (_React$Component) {
             label: "Nation",
             lineTension: 0,
             pointRadius: 6,
-            pointStyle: "triangle"
+            pointStyle: "triangle",
+            yAxisID: "y"
           }]
         },
         options: {
@@ -241,20 +266,32 @@ var TrendComparison = function (_React$Component) {
             display: false
           },
           scales: {
-            x: {
+            xAxes: [{
+              gridLines: {
+                drawBorder: false,
+                zeroLineColor: "#000000"
+              },
+              ticks: {
+                fontColor: "#000000"
+              }
+            }],
+            yAxes: [{
               display: true,
+              gridLines: {
+                display: false
+              },
+              id: "y",
+              position: "left",
               scaleLabel: {
                 display: true,
-                labelString: "Year"
-              }
-            },
-            y: {
-              display: true,
-              scaleLabel: {
-                display: true,
-                labelString: "Percent Change"
-              }
-            }
+                labelString: "Percent Change",
+                fontColor: "#000000"
+              },
+              ticks: {
+                fontColor: "#000000"
+              },
+              type: "linear"
+            }]
           }
         }
       });

@@ -78,6 +78,17 @@ function Summary(props) {
   );
 }
 
+// TODO: move chart logic to this class.
+class TrendComparisonChart extends React.Component {
+  componentDidMount() {
+
+  }
+
+  render() {
+
+  }
+}
+
 class TrendComparison extends React.Component {
   constructor(props) {
     super(props);
@@ -118,7 +129,7 @@ class TrendComparison extends React.Component {
           label: "Regional",
           lineTension: 0,
           pointRadius: 6,
-          pointStyle: "circle"
+          pointStyle: "circle",
           yAxisID: "y",
         }, {
           backgroundColor: "#4169E1",
@@ -147,15 +158,32 @@ class TrendComparison extends React.Component {
           display: false,
         },
         scales: {
-          y: {
+          xAxes: [{
+            gridLines: {
+              drawBorder: false,
+              zeroLineColor: "#000000",
+            },
+            ticks: {
+              fontColor: "#000000",
+            },
+          }],
+          yAxes: [{
             display: true,
+            gridLines: {
+              display: false,
+            },
+            id: "y",
             position: "left",
             scaleLabel: {
               display: true,
               labelString: "Percent Change",
+              fontColor: "#000000",
+            },
+            ticks: {
+              fontColor: "#000000",
             },
             type: "linear",
-          },
+          }],
         },
       },
     });
